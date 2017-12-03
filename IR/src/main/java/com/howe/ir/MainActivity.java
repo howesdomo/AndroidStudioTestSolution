@@ -3,46 +3,66 @@ package com.howe.ir;
 import android.content.Context;
 import android.hardware.ConsumerIrManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import com.enpot.utils.EnpotLog;
+import com.enpot.utils.DateTime;
 import com.howe.ir.utils.MessageBoxUtil;
-import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxTextView;
-import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import butterknife.OnClick;
+import butterknife.OnTouch;
 
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
     
-    @Bind(R.id.btnOpen)
-    Button btnOpen;
-    @Bind(R.id.btnClose)
-    Button btnClose;
     @Bind(R.id.edtFrequency)
     EditText edtFrequency;
-    @Bind(R.id.edtHDRMark)
-    EditText edtHDRMark;
-    @Bind(R.id.edtHDRSpace)
-    EditText edtHDRSpace;
-    @Bind(R.id.edtBitMark)
-    EditText edtBitMark;
-    @Bind(R.id.edtOneSpace)
-    EditText edtOneSpace;
-    @Bind(R.id.edtZeroSpace)
-    EditText edtZeroSpace;
+    @Bind(R.id.btnTVPower)
+    Button btnTVPower;
+    @Bind(R.id.btnTVSoundMinus)
+    Button btnTVSoundMinus;
+    @Bind(R.id.btnTVSoundPlus)
+    Button btnTVSoundPlus;
+    @Bind(R.id.btnTVChangeSources)
+    Button btnTVChangeSources;
+    @Bind(R.id.btnTVSilence)
+    Button btnTVSilence;
+    @Bind(R.id.btnSTBPower)
+    Button btnSTBPower;
+    @Bind(R.id.btnSTBSoundMinus)
+    Button btnSTBSoundMinus;
+    @Bind(R.id.btnSTBSoundPlus)
+    Button btnSTBSoundPlus;
+    @Bind(R.id.btnSTBOK)
+    Button btnSTBOK;
+    @Bind(R.id.btnSTBReturn)
+    Button btnSTBReturn;
+    @Bind(R.id.btnSTBBackspace)
+    Button btnSTBBackspace;
+    @Bind(R.id.btnSTBLeft)
+    Button btnSTBLeft;
+    @Bind(R.id.btnSTBUp)
+    Button btnSTBUp;
+    @Bind(R.id.btnSTBRight)
+    Button btnSTBRight;
+    @Bind(R.id.btnSTBDown)
+    Button btnSTBDown;
+    @Bind(R.id.btnSTBHomePage)
+    Button btnSTBHomePage;
+    @Bind(R.id.btnSTBMenu)
+    Button btnSTBMenu;
+    @Bind(R.id.btnSTBMouse)
+    Button btnSTBMouse;
+    
     
     /**
      * (核心)红外遥控
@@ -59,11 +79,16 @@ public class MainActivity extends AppCompatActivity
         
         // 获取系统的红外遥控服务
         mCIR = (ConsumerIrManager) getSystemService(Context.CONSUMER_IR_SERVICE);
+        
+        //region 加载震动设置
+        vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        //endregion
+        
         initEvents();
         initData();
     }
     
-    private Integer mFREQUENCY = 38400;
+    private Integer mFREQUENCY = 38000;
     private Integer mHDR_MARK = 9000;
     private Integer mHDR_SPACE = 4500;
     private Integer mBIT_MARK = 600;
@@ -73,11 +98,6 @@ public class MainActivity extends AppCompatActivity
     private void initData()
     {
         edtFrequency.setText(mFREQUENCY.toString());
-        edtHDRMark.setText(mHDR_MARK.toString());
-        edtHDRSpace.setText(mHDR_SPACE.toString());
-        edtBitMark.setText(mBIT_MARK.toString());
-        edtOneSpace.setText(mONE_SPACE.toString());
-        edtZeroSpace.setText(mZERO_SPACE.toString());
     }
     
     private void bindData()
@@ -85,11 +105,6 @@ public class MainActivity extends AppCompatActivity
         try
         {
             mFREQUENCY = Integer.valueOf(edtFrequency.getText().toString());
-            mHDR_MARK = Integer.valueOf(edtHDRMark.getText().toString());
-            mHDR_SPACE = Integer.valueOf(edtHDRSpace.getText().toString());
-            mBIT_MARK = Integer.valueOf(edtBitMark.getText().toString());
-            mONE_SPACE = Integer.valueOf(edtOneSpace.getText().toString());
-            mZERO_SPACE = Integer.valueOf(edtZeroSpace.getText().toString());
         }
         catch (Exception ex)
         {
@@ -99,319 +114,259 @@ public class MainActivity extends AppCompatActivity
     
     private void initEvents()
     {
-        //region 开机
-        RxView.clicks(btnOpen)
-                .throttleFirst(1, TimeUnit.SECONDS)
-                .subscribe(new Action1<Void>()
-                {
-                    @Override
-                    public void call(Void aVoid)
-                    {
-                        if (mCIR == null || mCIR.hasIrEmitter() == false)
-                        {
-                            MessageBoxUtil.ShowExceptionDialog(MainActivity.this, "本设备未找到可用的红外发射器。");
-                            return;
-                        }
-                        sendOpen();
-                    }
-                });
-        //endregion
         
-        RxView.clicks(btnClose)
-                .throttleFirst(1, TimeUnit.SECONDS)
-                .subscribe(new Action1<Void>()
-                {
-                    @Override
-                    public void call(Void aVoid)
-                    {
-                        if (mCIR == null || mCIR.hasIrEmitter() == false)
-                        {
-                            MessageBoxUtil.ShowExceptionDialog(MainActivity.this, "本设备未找到可用的红外发射器。");
-                            return;
-                        }
-                        getSomething();
-                    }
-                });
+    }
         
-        RxTextView.textChangeEvents(edtZeroSpace)
-                .debounce(300, TimeUnit.MILLISECONDS) //debounce:每次文本更改后有300毫秒的缓冲时间，默认在computation调度器
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<TextViewTextChangeEvent>()
-                {
-                    @Override
-                    public void call(TextViewTextChangeEvent textViewTextChangeEvent)
-                    {
-                        String key = textViewTextChangeEvent.text().toString().trim();
-                        if (StringUtils.isNotBlank(key))
-                        {
-                            edtBitMark.setText(key);
-                        }
-                        else
-                        {
-                            edtBitMark.setText("");
-                        }
-                    }
-                });
+    private int[] getPatterArrayByViewId(View btn)
+    {
+        int[] r = null;
+        
+        switch (btn.getId())
+        {
+            //region TV Button
+            
+            case R.id.btnTVPower:
+                r = new int[]{
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600};
+                break;
+            
+            case R.id.btnTVSoundMinus:
+                r = new int[]{
+                        2400, 600, 1200, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600};
+                break;
+            
+            case R.id.btnTVSoundPlus:
+                r = new int[]{
+                        2400, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600,};
+                break;
+            case R.id.btnTVChangeSources:
+                r = new int[]{
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600,};
+                break;
+            case R.id.btnTVSilence:
+                r = new int[]{
+                        2400, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600, 25750,
+                        2400, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 1200, 600, 600, 600, 600, 600, 600, 600, 600,};
+                break;
+            
+            //endregion TV Button
+            
+            //region STB Button
+            case R.id.btnSTBPower:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 600, 600, 1600, 600, 600, 600, 600, 600, 1600, 600, 1600, 600, 600, 600, 1600,
+                        600, 38991, 9000, 2227, 600,};
+                break;
+            case R.id.btnSTBSoundMinus:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 1600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38929, 9000, 2232, 600};
+                break;
+            case R.id.btnSTBSoundPlus:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38917, 9000, 2233, 600};
+                break;
+            case R.id.btnSTBOK:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 600,
+                        600, 600, 600, 1600, 600, 600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38923, 9000, 2233, 600};
+                break;
+            case R.id.btnSTBReturn:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 1600,
+                        600, 38947, 9000, 2235, 600};
+                break;
+            case R.id.btnSTBBackspace:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 1600, 600, 600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38953, 9000, 2233, 600};
+                break;
+            case R.id.btnSTBLeft:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38922, 9000, 2230, 600};
+                break;
+            case R.id.btnSTBUp:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 600,
+                        600, 600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38946, 9000, 2233, 600};
+                break;
+            case R.id.btnSTBRight:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38959, 9000, 2229, 600};
+                break;
+            case R.id.btnSTBDown:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 600,
+                        600, 1600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38968, 9000, 2233, 600};
+                break;
+            case R.id.btnSTBHomePage:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 600, 600, 600, 600, 600,
+                        600, 1600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 38959, 9000, 2234, 600};
+                break;
+            case R.id.btnSTBMenu:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 1600, 600, 600, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 600, 600, 1600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 600, 600, 1600,
+                        600, 38956, 9000, 2232, 600,};
+                break;
+            case R.id.btnSTBMouse:
+                r = new int[]{
+                        9000, 4500,
+                        600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
+                        600, 600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 600,
+                        600, 1600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 1600, 600, 600, 600, 1600,
+                        600, 38953, 9000, 2231, 600,};
+                break;
+            
+            //endregion STB Button
+        }
+        
+        return r;
     }
     
-    private void sendOpenDemo()
-    {
-        // 一种交替的载波序列模式，通过毫秒测量
-//        int[] pattern = {
-//                9000, 4500, // 起始码S电平宽度
-//                600, 600, 600, 600, 600, 1600, 600, 600, 600, 600,
-//                600, 600, 600, 600, 600, 600, 600, 1600, 600, 1600,
-//                600, 600, 600, 1600, 600, 1600, 600, 1600, 600, 1600,
-//                600, 1600, 600, 600, 600, // 35位数据码
-//                600, 20000, // 连接码C电平宽度
-//                600, 600, 600, 600, 1600, 600, 600, 600, 600, 600,
-//                600, 600, 600, 600, 1600, 600, 1600, 600, 1600, 600,
-//                600, 600, 1600, 600, 1600, 600, 1600, 600, 1600, 600,
-//                39344, 9000 // 32位数据码
-//            };
-        
-        int[] pattern =
-                {
-                        1901, 4453, 625, 1614, 625, 1588, 625, 1614, 625,
-                        442, 625, 442, 625, 468, 625, 442, 625, 494, 572, 1614,
-                        625, 1588, 625, 1614, 625, 494, 572, 442, 651, 442, 625,
-                        442, 625, 442, 625, 1614, 625, 1588, 651, 1588, 625, 442,
-                        625, 494, 598, 442, 625, 442, 625, 520, 572, 442, 625, 442,
-                        625, 442, 651, 1588, 625, 1614, 625, 1588, 625, 1614, 625,
-                        1588, 625, 48958
-                };
-
-//        int FREQUENCY = 38028;  // T = 26.296 us
-//        int HDR_MARK = 342;
-//        int HDR_SPACE = 171;
-//        int BIT_MARK = 21;
-//        int ONE_SPACE = 60;
-//        int ZERO_SPACE = 21;
-        
-        int FREQUENCY = 38400;  // T = 26.296 us
-        int HDR_MARK = 9000;
-        int HDR_SPACE = 4500;
-        int BIT_MARK = 600;
-        int ONE_SPACE = 1600;
-        int ZERO_SPACE = 600;
-
-//
-        IrCommandBuilder builder = IrCommandBuilder.irCommandBuilder(38400); // Static factory method
-        IrCommand builderCommand = builder
-                .pair(HDR_MARK, HDR_SPACE)  // Lead-in sequence
-                
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-//***
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-//***
-                
-                .mark(BIT_MARK)             // lead-out sequence
-                .build();
-        // mCIR.transmit(builderCommand.frequency, builderCommand.pattern);
-//
-
-//        IrCommand necCommand = IrCommand.NEC.buildNEC(32, 0x080040BF);
-//        pattern = necCommand.pattern;
-        
-        pattern = builderCommand.pattern;
-        // 在38.4KHz条件下进行模式转换
-        mCIR.transmit(38400, pattern);
-    }
     
+    DateTime mLastestTouchTime;
+    Integer mBtnId;
     
-    private void sendOpen() // 组织的是 0x08, 0x00, 0x40 // 接收到的是 FC 00 FF
+    @OnTouch({R.id.btnTVPower, R.id.btnTVSoundMinus, R.id.btnTVSoundPlus, R.id.btnTVChangeSources, R.id.btnTVSilence, R.id.btnSTBPower, R.id.btnSTBSoundMinus, R.id.btnSTBSoundPlus,
+            R.id.btnSTBOK, R.id.btnSTBReturn, R.id.btnSTBBackspace, R.id.btnSTBLeft, R.id.btnSTBUp, R.id.btnSTBRight, R.id.btnSTBDown, R.id.btnSTBHomePage, R.id.btnSTBMenu, R.id.btnSTBMouse})
+    public boolean onViewTouched(View v, MotionEvent e)
     {
-        bindData();
-        
-        IrCommandBuilder builder = IrCommandBuilder.irCommandBuilder(mFREQUENCY); // Static factory method
-        IrCommand builderCommand = builder
-                .pair(mHDR_MARK, mHDR_SPACE)  // Lead-in sequence
-                
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-//***
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-//***
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-//***
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-//***
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mZERO_SPACE) // 0
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-                .pair(mBIT_MARK, mONE_SPACE)  // 1
-//***
-                
-                .mark(mBIT_MARK)             // lead-out sequence
-                .build();
-        
-        int[] pattern = null;
-        pattern = builderCommand.pattern;
-        mCIR.transmit(builderCommand.frequency, builderCommand.pattern);
-    }
-    
-    // 勿动
-    private void sendOpenV2() // 组织的是 0x08, 0x00, 0x40 // 接收到的是 FC 00 FF
-    {
-        int FREQUENCY = 38400;  // T = 26.296 us
-        int HDR_MARK = 9000;
-        int HDR_SPACE = 4500;
-        int BIT_MARK = 600;
-        int ONE_SPACE = 1600;
-        int ZERO_SPACE = 600;
-        
-        IrCommandBuilder builder = IrCommandBuilder.irCommandBuilder(FREQUENCY); // Static factory method
-        IrCommand builderCommand = builder
-                .pair(HDR_MARK, HDR_SPACE)  // Lead-in sequence
-                
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-//***
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-//***
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ZERO_SPACE) // 0
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-                .pair(BIT_MARK, ONE_SPACE)  // 1
-//***
-                
-                .mark(BIT_MARK)             // lead-out sequence
-                .build();
-        int[] pattern = null;
-        pattern = builderCommand.pattern;
-        mCIR.transmit(38400, pattern);
-    }
-    
-    private void getSomething()
-    {
-        if (!mCIR.hasIrEmitter())
+        if (mCIR == null || mCIR.hasIrEmitter() == false)
         {
             MessageBoxUtil.ShowExceptionDialog(MainActivity.this, "本设备未找到可用的红外发射器。");
-            return;
+            return true;
         }
-        
-        
-        StringBuilder sb = new StringBuilder();
-        // 获得可用的载波频率范围
-        ConsumerIrManager.CarrierFrequencyRange[] freqs = mCIR.getCarrierFrequencies();
-        sb.append("IR Carrier Frequencies:\n");// 红外载波频率
-        // 边里获取频率段
-        for (ConsumerIrManager.CarrierFrequencyRange range : freqs)
+    
+        Button btn = (Button) v;
+                
+        if (e.getAction() == MotionEvent.ACTION_DOWN || e.getAction() == MotionEvent.ACTION_MOVE)
         {
-            sb.append(String.format("    %d - %d\n",
-                    range.getMinFrequency(), range.getMaxFrequency()
-            ));
+            if(mBtnId == null)
+            {
+                mBtnId = new Integer(btn.getId());
+                PlaySuccessVibrator();
+            }
+            
+            if(mBtnId.equals(btn.getId()) == false)
+            {
+                return true;
+            }
+            
+            DateTime now = DateTime.now();
+            if (mLastestTouchTime != null)
+            {
+                DateTime a = new DateTime(mLastestTouchTime.getTimeInMillis());
+                a.add(DateTime.MILLISECOND_FIELD, 300);
+                if (a.after(now))
+                {
+                    return true;
+                }
+            }
+            
+            mFREQUENCY = Integer.valueOf(edtFrequency.getText().toString());
+            int[] pattern = this.getPatterArrayByViewId(v);
+            mCIR.transmit(mFREQUENCY, pattern);
+            mLastestTouchTime = now;
+            
         }
-        EnpotLog.i(sb.toString());
-        
-        // mFreqsText.setText(b.toString());// 显示结果
-        // MessageBoxUtil.ShowInfoDialog(MainActivity.this, sb.toString());
+        else if (e.getAction() == MotionEvent.ACTION_UP)
+        {
+            if(mBtnId.equals(btn.getId()) == false)
+            {
+                return true;
+            }
+            
+            mBtnId = null;
+            mLastestTouchTime = null;
+        }
+        return true;
     }
+
+    
+    private Vibrator vibrator;
+    
+    /**
+     * 震动
+     */
+    private long[] vibrator_pattern_success = {100, 400}; // 停止 开启 停止 开启
+    private long[] vibrator_pattern_error = {100, 400, 100, 400, 100, 400, 100, 400};
+    
+    public void PlaySuccessVibrator()
+    {
+        vibrator.vibrate(vibrator_pattern_success, -1);
+    }
+    
+    public void PlayErrorVibrator()
+    {
+        vibrator.vibrate(vibrator_pattern_error, -1);
+    }
+    
 }
