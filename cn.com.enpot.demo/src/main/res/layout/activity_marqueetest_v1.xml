@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="10"
+        android:text="走马灯效果 - TextView
+优点: 安卓原生设置简单
+缺点:
+(1) 无法控制开始时间, 无法走动的速度;
+(2) 丢失焦点后走马灯效果停止" />
+
+    <TextView
+        android:id="@+id/lblA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="@color/red"
+        android:text="走马灯效果 1.....走马灯效果 2.....走马灯效果 3.....走马灯效果 4.....走马灯效果 5.....走马灯效果 6.....走马灯效果 7.....走马灯效果 8....." />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="10"
+        android:text="走马灯效果 - MarqueeTextView(继承TextView)
+优点:
+(1)安卓原生设置上继承所得
+(2)修复了失去焦点走马灯效果停止的问题
+缺点:
+(1)无法控制开始时间, 无法走动的速度
+(2)走马灯仍然会受其他控件的焦点获取缺失影响到
+" />
+
+    <cn.com.enpot.cncomenpotdemo.component.MarqueeTextView
+        android:id="@+id/lblB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="@color/red"
+        android:text="ABCDEFGHIJKLMNOPQRSTUVWXYZ_>_>_>_>_>ABCDEFGHIJKLMNOPQRSTUVWXYZ" />
+
+    <!-- 关键配置
+        android:ellipsize="marquee" // 走马灯效果
+        android:marqueeRepeatLimit="marquee_forever" // 走马灯效果重复次数
+        android:singleLine="true" (提示过时) !!!!! 不能使用 android:maxLines="1" 试用过无效
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+    -->
+
+    <EditText
+        android:id="@+id/txtA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选中此控件, TextView 的走马灯效果停止"
+        android:maxLines="1"
+        />
+
+    <EditText
+        android:id="@+id/txtB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选中此控件, TextView 的走马灯效果停止"
+        android:maxLines="1"
+        />
+
+</LinearLayout>

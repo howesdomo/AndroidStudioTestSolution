@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.howe.ir.MainActivity">
+
+    <Button
+        android:id="@+id/btnOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开机"
+        tools:layout_editor_absoluteX="148dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintVertical_bias="0.121"/>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关机"
+        app:layout_constraintLeft_toRightOf="@+id/btnOpen"
+        app:layout_constraintTop_toTopOf="@+id/btnOpen"
+        android:layout_marginLeft="26dp"
+        android:layout_marginTop="0dp"/>
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="72dp"
+        android:layout_height="56dp"
+        app:layout_constraintDimensionRatio="4:3"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.71"
+        app:srcCompat="@drawable/gree"
+        android:layout_marginLeft="94dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline2"
+        app:layout_constraintGuide_begin="218dp"
+        android:orientation="horizontal"/>
+
+    <EditText
+        android:id="@+id/edtFrequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        tools:layout_editor_absoluteY="12dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.686"/>
+
+    <EditText
+        android:id="@+id/edtHDRMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/edtFrequency"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/edtFrequency"/>
+
+    <EditText
+        android:id="@+id/edtHDRSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/edtHDRMark"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/edtHDRMark"/>
+
+    <EditText
+        android:id="@+id/edtBitMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/edtHDRSpace"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/edtHDRSpace"/>
+
+    <EditText
+        android:id="@+id/edtOneSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/edtBitMark"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/edtBitMark"/>
+
+    <TextView
+        android:id="@+id/lblFrequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="FREQ"
+        app:layout_constraintRight_toLeftOf="@+id/edtFrequency"
+        app:layout_constraintTop_toTopOf="@+id/edtFrequency"/>
+
+    <TextView
+        android:id="@+id/lblHDRMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="HDRMark"
+        app:layout_constraintRight_toLeftOf="@+id/edtHDRMark"
+        app:layout_constraintTop_toTopOf="@+id/edtHDRMark"/>
+
+    <TextView
+        android:id="@+id/lblHDRSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="HDRSpace"
+        app:layout_constraintRight_toLeftOf="@+id/edtHDRSpace"
+        app:layout_constraintTop_toTopOf="@+id/edtHDRSpace"/>
+
+    <TextView
+        android:id="@+id/lblBitMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="BitMark"
+        app:layout_constraintRight_toLeftOf="@+id/edtBitMark"
+        app:layout_constraintTop_toTopOf="@+id/edtBitMark"/>
+
+    <TextView
+        android:id="@+id/lblOneSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="OneSpace"
+        app:layout_constraintRight_toLeftOf="@+id/edtOneSpace"
+        app:layout_constraintTop_toTopOf="@+id/edtOneSpace"/>
+
+    <TextView
+        android:id="@+id/lblZeroSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="ZeroSpace"
+        app:layout_constraintRight_toLeftOf="@+id/edtZeroSpace"
+        app:layout_constraintTop_toTopOf="@+id/edtZeroSpace"/>
+
+    <EditText
+        android:id="@+id/edtZeroSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@+id/edtOneSpace"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="@+id/edtOneSpace"/>
+
+
+</android.support.constraint.ConstraintLayout>

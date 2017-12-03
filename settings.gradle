@@ -1,0 +1,1 @@
+include ':enpot_location', ':scanprint', ':IR', ':rxjava_sample_rengwuxian', 'cn.com.enpot.demo'
