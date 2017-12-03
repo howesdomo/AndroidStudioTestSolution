@@ -3,10 +3,17 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidStudioTestSolution.iml" filepath="$PROJECT_DIR$/AndroidStudioTestSolution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidStudioTestSolution.iml" filepath="$PROJECT_DIR$/AndroidStudioTestSolution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IR/IR.iml" filepath="$PROJECT_DIR$/IR/IR.iml" />
       <module fileurl="file://$PROJECT_DIR$/IR/IR.iml" filepath="$PROJECT_DIR$/IR/IR.iml" />
       <module fileurl="file://$PROJECT_DIR$/cn.com.enpot.demo/cn.com.enpot.demo.iml" filepath="$PROJECT_DIR$/cn.com.enpot.demo/cn.com.enpot.demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cn.com.enpot.demo/cn.com.enpot.demo.iml" filepath="$PROJECT_DIR$/cn.com.enpot.demo/cn.com.enpot.demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/enpot_location/enpot_location.iml" filepath="$PROJECT_DIR$/enpot_location/enpot_location.iml" />
+      <module fileurl="file://$PROJECT_DIR$/enpot_location/enpot_location.iml" filepath="$PROJECT_DIR$/enpot_location/enpot_location.iml" />
+      <module fileurl="file://$PROJECT_DIR$/howestimer/howestimer.iml" filepath="$PROJECT_DIR$/howestimer/howestimer.iml" />
       <module fileurl="file://$PROJECT_DIR$/rxjava_sample_rengwuxian/rxjava_sample_rengwuxian.iml" filepath="$PROJECT_DIR$/rxjava_sample_rengwuxian/rxjava_sample_rengwuxian.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rxjava_sample_rengwuxian/rxjava_sample_rengwuxian.iml" filepath="$PROJECT_DIR$/rxjava_sample_rengwuxian/rxjava_sample_rengwuxian.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scanprint/scanprint.iml" filepath="$PROJECT_DIR$/scanprint/scanprint.iml" />
       <module fileurl="file://$PROJECT_DIR$/scanprint/scanprint.iml" filepath="$PROJECT_DIR$/scanprint/scanprint.iml" />
     </modules>
   </component>
