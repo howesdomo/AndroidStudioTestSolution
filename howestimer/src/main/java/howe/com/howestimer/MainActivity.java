@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void call(Void aVoid)
                     {
-                        mWhileBoolean = true;
                         mCount = 0;
                         llControl.setVisibility(View.GONE);
                         
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void call(Void aVoid)
                     {
-                        txtTimeA.setText("3");
+                        txtTimeA.setText("5");
                         txtTimeB.setText("7");
                         switchVibrate.setChecked(true);
                     }
@@ -208,10 +207,20 @@ public class MainActivity extends AppCompatActivity
     
     private Boolean mIsPlaySound = false;
     private Boolean mIsVibrate = false;
-    
+
+    Thread mThread = null;
     private void method()
     {
-        Thread nT = new Thread(new Runnable()
+        if(mThread != null && mThread.isAlive() == true)
+        {
+            while(mThread.isInterrupted() == false)
+            {
+                mThread.interrupt();
+            }
+        }
+
+        mWhileBoolean = true;
+        mThread = new Thread(new Runnable()
         {
             @Override
             public void run()
@@ -232,8 +241,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-        
-        nT.start();
+
+        mThread.start();
     }
     
     private Runnable Runnable_A = new Runnable()
